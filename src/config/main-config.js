@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const expressValidator = require("express-validator");
 const session = require("express-session");
 const flash = require("express-flash");
+const logger = require("morgan");
 
 module.exports = {
     init(app, express) {
@@ -12,15 +13,16 @@ module.exports = {
         app.set("view engine", "ejs");
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(express.static(path.join(__dirname, "..", "assets")));
-         app.use(expressValidator());
-         app.use(session({
-             secret: process.env.cookieSecret,
-             resave: false,
-             saveUninitialized: false,
-             cookie: {
-                 maxAge: 60000
-             }
-         }));
-         app.use(flash());
+        app.use(expressValidator());
+        app.use(session({
+            secret: process.env.cookieSecret,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                maxAge: 60000
+            }
+        }));
+        app.use(flash());
+        app.use(logger('dev'));
     }
 };
