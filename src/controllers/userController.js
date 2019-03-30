@@ -1,8 +1,7 @@
 const userQueries = require("../db/queries.users");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-// const passport = require("passport");
+const passport = require("passport");
 
 module.exports = {
     
@@ -22,8 +21,11 @@ module.exports = {
                 req.flash("error", err);
                 res.redirect("/users/signup");
             } else {
-                req.flash("notice", "You've successfully signed in!");
-                res.redirect("/");
+                passport.authenticate("local")(req, res, () => {
+                    req.flash("notice", "You've successfully signed in!");
+                    res.redirect("/");
+                });
+
                 const msg = {
                     to: user.email,
                     from: 'davidgentile@gmail.com',
@@ -32,13 +34,30 @@ module.exports = {
                     html: '<h2>Welcome to Blocipedia!</h2>',
                 };
                 sgMail.send(msg);
+            }
+        });
+    },
 
-            // passport.authenticate("local")(req, res, () => {
-            //  req.flash("notice", "You've successfully signed in!");
-            //  res.redirect("/");
-            // });
-        }
-     });
-   }
+    signInForm(req, res, next){
+        res.render("users/sign_in");
+    },
+
+    signIn(req, res, next){
+        passport.authenticate("local")(req, res, function () {
+            if (!req.user) {
+                req.flash("notice", "Sign in failed. Please try again.")
+                res.redirect("/users/sign_in");
+            } else {
+                req.flash("notice", "You've successfully signed in!");
+                res.redirect("/");
+            }
+        });
+    },
+
+    signOut(req, res, next){
+        req.logout();
+        req.flash("notice", "You've successfully signed out!");
+        res.redirect("/");
+    }
 
 };
