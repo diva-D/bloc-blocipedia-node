@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    role: DataTypes.STRING
+    role: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
   }, {});
   User.associate = function(models) {
     User.hasMany(models.Wiki, {
