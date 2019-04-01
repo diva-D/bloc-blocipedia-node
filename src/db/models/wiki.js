@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    body: DataTypes.STRING,
+    body: DataTypes.TEXT,
     private: DataTypes.BOOLEAN,
     userId: {
       type: DataTypes.INTEGER,
