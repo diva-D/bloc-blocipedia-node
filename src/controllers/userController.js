@@ -1,4 +1,5 @@
 const userQueries = require("../db/queries.users");
+const wikiQueries = require("../db/queries.wikis");
 const Authorizer = require("../policies/user");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -7,6 +8,7 @@ const keyPublishable = process.env.PUBLISHABLE_KEY;
 const keySecret = process.env.SECRET_KEY;
 const stripe = require("stripe")(keySecret);
 const User = require("../db/models").User;
+const Wiki = require("../db/models").Wiki;
 
 module.exports = {
     
@@ -101,10 +103,14 @@ module.exports = {
         )
         .then(charge => {
             if(charge.paid){
-                User.update( { role: 1 }, { where: {id: req.user.id } })
-                .then((rowsUpdated) => {
-                    req.flash("notice", "You've successfully upgraded!");
-                    res.redirect(`/users/${req.user.id}`);
+                userQueries.upgradeUser(req.user.id, (err, user) => {
+                    if (err) {
+                        req.flash("error", err);
+                        res.redirect(req.headers.referer);
+                    } else {
+                        req.flash("notice", "You've successfully upgraded!");
+                        res.redirect(req.headers.referer);
+                    }
                 });
             }
         })
@@ -114,15 +120,39 @@ module.exports = {
     },
 
     downgrade(req, res, next){
-        User.update({ role: 0 }, { where: { id: req.user.id }
-        })
-        .then((rowsUpdated) => {
-            req.flash("notice", "You've successfully downgraded!");
-            res.redirect(`/users/${req.user.id}`);
-        })
-        .catch((err) => {
-            console.log(err);
-            done();
+        userQueries.downgradeUser(req.user.id, (err, user) => {
+            if (err) {
+                req.flash("error", err);
+                res.redirect(req.headers.referer);
+            } else {
+                wikiQueries.downgradeWikis(req.user.id, (err, wikis) => {
+                    if(err) {
+                        req.flash("error", err);
+                        res.redirect(req.headers.referer);
+                    } else {
+                        req.flash("notice", "You've successfully downgraded!");
+                        res.redirect(req.headers.referer);
+                    }
+                });
+            }
+        });
+    },
+
+    wikis(req, res, next){
+        userQueries.getUser(req.params.id, (err, user) => {
+            if (err || user == undefined) {
+                req.flash("notice", "No user found with that ID.");
+                res.redirect("/");
+            } else {
+                const authorized = new Authorizer(req.user, user).new();
+
+                if (authorized) {
+                    res.render("users/wikis", { user });
+                } else {
+                    req.flash("notice", "You are not authorized to do that.");
+                    res.redirect("/");
+                }
+            }
         });
     }
 

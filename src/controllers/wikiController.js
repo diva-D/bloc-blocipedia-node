@@ -7,12 +7,11 @@ module.exports = {
             if (err) {
                 res.redirect(500, "static/index");
             } else {
-                res.render("wikis/index", {
-                    wikis
-                });
+                res.render("wikis/index", { wikis });
             }
         });
     },
+
     new(req, res, next) {
         const authorized = new Authorizer(req.user).new();
         if (authorized) {
@@ -22,18 +21,18 @@ module.exports = {
             res.redirect("/wikis");
         }
     },
+
     create(req, res, next) {
         const authorized = new Authorizer(req.user).create();
 
         if (authorized) {
-
             let newWiki = {
                 title: req.body.title,
                 body: req.body.body,
-                userId: req.user.id
+                userId: req.user.id,
+                private: req.body.private
             };
             wikiQueries.addWiki(newWiki, (err, wiki) => {
-                console.log(err);
                 if (err) {
                     res.redirect(500, "/wikis/new");
                 } else {
@@ -55,6 +54,7 @@ module.exports = {
             }
         });
     },
+
     destroy(req, res, next) {
         wikiQueries.deleteWiki(req, (err, wiki) => {
             if (err) {
@@ -64,6 +64,7 @@ module.exports = {
             }
         });
     },
+
     edit(req, res, next) {
         wikiQueries.getWiki(req.params.id, (err, wiki) => {
             if (err || wiki == null) {
@@ -83,12 +84,25 @@ module.exports = {
             }
         });
     },
+
     update(req, res, next) {
         wikiQueries.updateWiki(req, req.body, (err, wiki) => {
             if (err || wiki == null) {
                 res.redirect(404, `wikis/${req.params.id}/edit`);
             } else {
                 res.redirect(`/wikis/${req.params.id}`);
+            }
+        });
+    },
+
+    private(req, res, next){
+        wikiQueries.updateWiki(req, req.body, (err, wiki) => {
+            if (err || wiki == null) {
+                req.flash("error", "Wiki status not changed");
+                res.redirect(req.headers.referer);
+            } else {
+                req.flash("notice", `${wiki.title}'s status successfully updated to ${wiki.private ? "private" : "public"}`);
+                res.redirect(req.headers.referer);
             }
         });
     },

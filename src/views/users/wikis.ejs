@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <% include ../static/partials/head.ejs %>
+</head>
+
+<body>
+    <% include ../static/partials/navbar.ejs %>
+
+    <main class="container">
+        
+        <% include ../static/partials/messages.ejs %>
+        <h1>My Wikis</h1>
+
+        <table class="table table-hover table-bordered">
+            <thead>
+                <th scope="col">Wiki Title</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+                <% if (user.role != 0) { %>
+                    <th scope="col">Wiki Visibility</th>
+                <% } %>
+            </thead>
+            <tbody>
+                <% user.wikis.forEach((wiki) => { %>
+                    <tr>
+                        <td>
+                            <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+                        </td>
+                        <td>
+                            <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-warning">Edit</a>
+                        </td>
+                        <td>
+                            <form style="display:initial" action="/wikis/<%= wiki.id %>/destroy" method="post">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                        <% if (user.role != 0) { %>
+                            <td>
+                                <form action="/wikis/<%= wiki.id %>/private" method="post">
+                                    <div class="form-check form-group">
+                                        <input type="radio" id="public" name="private" value="false"
+                                            <% if(!wiki.private) { %>
+                                                checked
+                                            <% } %>
+                                            onclick="this.form.submit()" 
+                                        />
+                                        <label for="public">Public</label>
+                                    </div>
+                                    <div class="form-check form-group">
+                                        <input type="radio" id="private" name="private" value="true"
+                                            <% if(wiki.private) { %>
+                                                checked
+                                            <% } %>
+                                            onclick="this.form.submit()" 
+                                        />
+                                        <label for="private">Private</label>
+                                    </div>
+                                </form>
+                            </td>
+                        <% } %>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        
+        <a href="/wikis/new" class="btn btn-success">New Wiki</a>
+
+    </main>
+
+    <% include ../static/partials/baseScripts.ejs %>
+</body>
+
+</html>

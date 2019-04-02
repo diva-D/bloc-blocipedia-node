@@ -12,5 +12,6 @@ router.get("/users/sign_out", userController.signOut);
 router.get("/users/:id", userController.show);
 router.post("/users/upgrade", userController.upgrade);
 router.post("/users/downgrade", userController.downgrade);
+router.get("/users/:id/wikis", userController.wikis);
 
 module.exports = router;

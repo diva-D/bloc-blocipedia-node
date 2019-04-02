@@ -7,7 +7,9 @@
     <% include ../static/partials/navbar.ejs %>
 
     <main class="container">
+
         <% include ../static/partials/messages.ejs %>
+
         <h1>New Wiki</h1>
 
         <form action="/wikis/create" method="POST">
@@ -19,6 +21,19 @@
                 <label for="body">body</label>
                 <textarea name="body" class="form-control" rows="4" placeholder="Enter Body"></textarea>
             </div>
+            <% if (currentUser.role !== 0) { %>
+                <h3>Private or Public?</h3>
+                <div class="form-group">
+                    <div class="form-check">
+                        <label for="private">Public</label>
+                        <input type="radio" id="public" name="private" value="false">
+                    </div>
+                    <div class="form-check">
+                        <label for="private">Private</label>
+                        <input type="radio" id="public" name="private" value="true">
+                    </div>
+                </div>
+            <% } %>
             <button class="btn btn-primary" type="submit">Submit</button>
         </form>
     </main>

@@ -34,10 +34,13 @@
                     </form>
             <% } else if (user.role === 1) { %>
                 <p>Premium plan</p>
-                <form action="/users/downgrade" method="post">
+                <form action="/users/downgrade" method="post" onsubmit="return confirm('WARNING: downgrading will convert all your private wikis into public ones. Do you wish to continue?')">
                     <button type="submit" class="btn btn-warning">Downgrade to Standard</button>
                 </form>
             <% } %>
+
+                <a href="/users/<%= user.id %>/wikis"><button class="btn btn-primary">List of wikis</button></a>
+        
         </main>
         
         

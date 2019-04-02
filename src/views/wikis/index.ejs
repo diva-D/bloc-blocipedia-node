@@ -3,8 +3,12 @@
         <% include ../static/partials/head.ejs %>
     </head>
     <body>
+
+        <% include ../static/partials/navbar.ejs %>
+        
         <main class="container">
-            <% include ../static/partials/navbar.ejs %>
+
+            <% include ../static/partials/messages.ejs %>
 
             <h1>Public Wikis</h1>
 
@@ -12,14 +16,25 @@
                 <a href="/wikis/new" class="btn btn-success">New Wiki</a>
                 <br/>
             <% } %>
-            <ul class="list-group">
-                <% wikis.forEach((wiki) => { %>
-                    <li class="list-group-item">
-                        <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
-                    </li>
-                <% }) %>
-            </ul>
+            <table class="table table-hover">
+                <thead>
+                    <th scope="col">Wiki Title</th>
+                </thead>
+                <tbody>
+                    <% wikis.forEach((wiki) => { %>
+                        <% if(!wiki.private) { %>
+                            <tr>
+                                <td>
+                                    <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% }) %>
+                </tbody>
+            </table>
             
         </main>
+
+        <% include ../static/partials/baseScripts.ejs %>
     </body>
 </html>

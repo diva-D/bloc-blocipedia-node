@@ -49,7 +49,7 @@ module.exports = {
             const authorized = new Authorizer(req.user, wiki).update();
 
             if (authorized) {
-
+                console.log(updatedWiki);
                 wiki.update(updatedWiki, {
                         fields: Object.keys(updatedWiki)
                     })
@@ -86,4 +86,13 @@ module.exports = {
         });
     },
 
+    downgradeWikis(userId, callback){
+        Wiki.update( { private: false }, { where: {userId: userId } })
+        .then((wikis) => {
+            callback(null, wikis);
+        })
+        .catch((err) => {
+            callback(err);
+        });
+    },
 };
