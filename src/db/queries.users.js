@@ -17,6 +17,20 @@ module.exports = {
         .catch((err) => {
             callback(err);
         });
+    },
+
+    getUser(id, callback){
+        User.findById(id)
+        .then((user) => {
+            if (!user) {
+                callback(404);
+            } else {
+                callback(null, user);
+            }
+        })
+        .catch((err) => {
+            callback(err);
+        });
     }
 
 };
