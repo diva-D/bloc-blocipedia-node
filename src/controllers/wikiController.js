@@ -1,5 +1,7 @@
 const wikiQueries = require("../db/queries.wikis");
 const Authorizer = require("../policies/wiki");
+const markdown = require("markdown").markdown;
+const TurndownService = require('turndown');
 
 module.exports = {
     index(req, res, next) {
@@ -26,9 +28,11 @@ module.exports = {
         const authorized = new Authorizer(req.user).create();
 
         if (authorized) {
+            let wikiMarkdown = markdown.toHTML(req.body.body);
+            
             let newWiki = {
                 title: req.body.title,
-                body: req.body.body,
+                body: wikiMarkdown,
                 userId: req.user.id,
                 private: req.body.private
             };
@@ -74,6 +78,10 @@ module.exports = {
                 const authorized = new Authorizer(req.user, wiki).edit();
 
                 if (authorized) {
+                    let turndownService = new TurndownService()
+                    let markdown = turndownService.turndown(wiki.body);
+                    wiki.body = markdown;
+                    
                     res.render("wikis/edit", {
                         wiki
                     });
@@ -86,6 +94,9 @@ module.exports = {
     },
 
     update(req, res, next) {
+        let wikiMarkdown = markdown.toHTML(req.body.body);
+        req.body.body = wikiMarkdown;        
+
         wikiQueries.updateWiki(req, req.body, (err, wiki) => {
             if (err || wiki == null) {
                 res.redirect(404, `wikis/${req.params.id}/edit`);

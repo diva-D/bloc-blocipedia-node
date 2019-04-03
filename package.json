@@ -19,6 +19,7 @@
     "express-flash": "0.0.2",
     "express-session": "^1.15.6",
     "express-validator": "^5.3.1",
+    "markdown": "^0.5.0",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
@@ -26,7 +27,8 @@
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.32.6",
     "sequelize-cli": "^5.4.0",
-    "stripe": "^6.28.0"
+    "stripe": "^6.28.0",
+    "turndown": "^5.0.3"
   },
   "devDependencies": {
     "faker": "^4.1.0",

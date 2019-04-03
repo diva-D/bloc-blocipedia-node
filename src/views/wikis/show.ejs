@@ -10,7 +10,7 @@
         <h1><%= wiki.title %></h1>
         
         <div>
-            <%= wiki.body %>
+            <%- wiki.body %>
         </div>
                 
         <% if( currentUser && currentUser.id == wiki.userId) { %>
