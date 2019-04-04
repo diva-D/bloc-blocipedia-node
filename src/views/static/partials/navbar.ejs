@@ -10,10 +10,15 @@
                 <li class="nav-item">
                     <a href="/" class="nav-link">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a href="/wikis" class="nav-link">Public Wikis</a>
-                </li>
+                <% if(!currentUser) { %>
+                    <li class="nav-item">
+                        <a href="/wikis/public" class="nav-link">Public Wikis</a>
+                    </li>
+                <% } %>
                 <% if(currentUser) { %>
+                    <li class="nav-item">
+                        <a href="/wikis" class="nav-link">All Wikis</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/users/<%= currentUser.id %>/wikis">My Wikis</a>
                     </li>

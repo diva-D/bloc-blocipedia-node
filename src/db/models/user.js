@@ -1,3 +1,6 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var User = sequelize.define('User', {
@@ -24,6 +27,31 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       as: "wikis"
     });
+
+    User.hasMany(models.Collaborator, {
+      foreignKey: "userId",
+      as: "collaborators",
+    });
+
+    User.addScope("allUsers", (wikiId) => {
+      return {
+        where: {
+          role: {
+            [Op.ne]: 2
+          }
+        },
+        include: [{
+          model: models.Collaborator, as: "collaborators",
+          // where: {
+          //   wikiId: wikiId
+          // },
+          required: false
+        }],
+      };
+    });
+
   };
+
+
   return User;
 };

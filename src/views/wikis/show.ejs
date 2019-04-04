@@ -7,17 +7,27 @@
     <% include ../static/partials/navbar.ejs %>
 
     <main class="container">
+        <% include ../static/partials/messages.ejs %>
+
         <h1><%= wiki.title %></h1>
         
         <div>
             <%- wiki.body %>
         </div>
-                
-        <% if( currentUser && currentUser.id == wiki.userId) { %>
+        <% let userIsCollab %>
+        <% if(currentUser) { %>
+            <% userIsCollab = collaborators.filter(collab => collab.userId == currentUser.id).length > 0; %>
+        <% } else { %>
+            <% userIsCollab = false %>
+        <% } %>
+        
+        <% if( currentUser && (currentUser.id == wiki.userId || userIsCollab) ) { %>
             <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-warning">Edit</a>
-            <form style="display:initial" action="/wikis/<%= wiki.id %>/destroy" method="post">
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+            <% if( currentUser.id == wiki.userId || currentUser.role == 2) { %>
+                <form style="display:initial" action="/wikis/<%= wiki.id %>/destroy" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            <% } %>
         <% } %>
 
 

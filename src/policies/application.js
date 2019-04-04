@@ -15,6 +15,15 @@ module.exports = class ApplicationPolicy {
     _isMember() {
         return this.user && this.user.role == "0";
     }
+    
+    _isPremium() {
+        return this.user && this.user.role == "1";
+    }
+
+    _isCollaborator() {
+        let userIsCollab = this.record.collaborators.filter(collab => collab.userId == this.user.id).length > 0;
+        return this.user && userIsCollab;
+    }
 
     new() {
         return this.user != null;
@@ -30,7 +39,7 @@ module.exports = class ApplicationPolicy {
 
     edit() {
         return this.new() &&
-            this.record && (this._isOwner() || this._isAdmin());
+            this.record && (this._isOwner() || this._isAdmin() || this._isCollaborator);
     }
 
     update() {

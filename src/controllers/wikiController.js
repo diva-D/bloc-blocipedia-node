@@ -14,6 +14,18 @@ module.exports = {
         });
     },
 
+    public(req, res, next) {
+        wikiQueries.getAllWikis((err, wikis) => {
+            if (err) {
+                res.redirect(500, "static/index");
+            } else {
+                res.render("wikis/public", {
+                    wikis
+                });
+            }
+        });
+    },
+
     new(req, res, next) {
         const authorized = new Authorizer(req.user).new();
         if (authorized) {
@@ -50,11 +62,11 @@ module.exports = {
     },
 
     show(req, res, next) {
-        wikiQueries.getWiki(req.params.id, (err, wiki) => {
-            if (err || wiki == null) {
+        wikiQueries.getWiki(req.params.id, (err, result) => {
+            if (err || result == null) {
                 res.redirect(404, "/");
             } else {
-                res.render("wikis/show", { wiki });
+                res.render("wikis/show", {...result});
             }
         });
     },
@@ -62,7 +74,7 @@ module.exports = {
     destroy(req, res, next) {
         wikiQueries.deleteWiki(req, (err, wiki) => {
             if (err) {
-                res.redirect(err, `wikis/${req.params.id}`);
+                res.redirect(err, `/wikis/${req.params.id}`);
             } else {
                 res.redirect(303, "/wikis");
             }
@@ -70,21 +82,18 @@ module.exports = {
     },
 
     edit(req, res, next) {
-        wikiQueries.getWiki(req.params.id, (err, wiki) => {
-            if (err || wiki == null) {
+        wikiQueries.getWiki(req.params.id, (err, result) => {
+            if (err || result == null) {
                 res.redirect(404, "/");
             } else {
-
-                const authorized = new Authorizer(req.user, wiki).edit();
+                const authorized = new Authorizer(req.user, result.wiki).edit();
 
                 if (authorized) {
-                    let turndownService = new TurndownService()
-                    let markdown = turndownService.turndown(wiki.body);
-                    wiki.body = markdown;
+                    let turndownService = new TurndownService();
+                    let markdown = turndownService.turndown(result.wiki.body);
+                    result.wiki.body = markdown;
                     
-                    res.render("wikis/edit", {
-                        wiki
-                    });
+                    res.render("wikis/edit", {...result});
                 } else {
                     req.flash("notice", "You are not authorized to do that.");
                     res.redirect(`/wikis/${req.params.id}`);

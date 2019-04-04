@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <% include ../static/partials/head.ejs %>
+    </head>
+    <body>
+
+        <% include ../static/partials/navbar.ejs %>
+        
+        <main class="container">
+
+            <% include ../static/partials/messages.ejs %>
+
+            <h1>Public Wikis</h1>
+
+            <table class="table table-hover">
+                <thead>
+                    <th scope="col">Wiki Title</th>
+                    <th scope="col">Owner</th>
+                    <th scope="col">Created</th>
+                </thead>
+                <tbody>
+                    <% wikis.forEach((wiki) => { %>
+                        <% if(!wiki.private) { %>
+                            <tr>
+                                <td>
+                                    <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+                                </td>
+                                <td>
+                                    <%= wiki.User.email %>
+                                </td>
+                                <td>
+                                    <%= wiki.createdAt.toLocaleDateString() %>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% }) %>
+                </tbody>
+            </table>
+            
+        </main>
+
+        <% include ../static/partials/baseScripts.ejs %>
+    </body>
+</html>

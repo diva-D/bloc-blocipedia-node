@@ -10,7 +10,7 @@
 
             <% include ../static/partials/messages.ejs %>
 
-            <h1>Public Wikis</h1>
+            <h1>All Wikis</h1>
 
             <% if(currentUser) { %>
                 <a href="/wikis/new" class="btn btn-success">New Wiki</a>
@@ -19,13 +19,44 @@
             <table class="table table-hover">
                 <thead>
                     <th scope="col">Wiki Title</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Owner</th>
+                    <th scope="col">Created</th>
                 </thead>
                 <tbody>
                     <% wikis.forEach((wiki) => { %>
-                        <% if(!wiki.private) { %>
+                        <% let userIsCollab %>
+                        <% if(currentUser) { %>
+                            <% userIsCollab = wiki.collaborators.filter(collab => collab.userId == currentUser.id).length > 0; %>
+                        <% } else { %>
+                            <% userIsCollab = false %>
+                        <% } %>
+
+                        <% if(!wiki.private || userIsCollab || wiki.userId == currentUser.id) { %>
                             <tr>
                                 <td>
                                     <a href="/wikis/<%= wiki.id %>"> <%= wiki.title %> </a>
+                                </td>
+                                <% if(userIsCollab) { %>
+                                    <td class="table-info">
+                                        <% } else if (wiki.userId == currentUser.id) { %>
+                                    <td class="table-success">
+                                        <% } else { %>
+                                    <td>
+                                <% } %>
+                                    <% if(wiki.userId == currentUser.id) { %>
+                                        Mine
+                                    <% } else if (userIsCollab) { %>
+                                        Collaborator
+                                    <% } else { %>
+                                        Public
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <%= wiki.User.email %>
+                                </td>
+                                <td>
+                                    <%= wiki.createdAt.toLocaleDateString() %>
                                 </td>
                             </tr>
                         <% } %>
